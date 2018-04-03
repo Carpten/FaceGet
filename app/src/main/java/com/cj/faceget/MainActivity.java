@@ -12,6 +12,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.cj.faceget.model.ResponseBean;
+import com.cj.faceget.net.RetrofitClient;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -41,11 +49,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startFaceGet() {
-        String name = ((EditText) findViewById(R.id.et_name)).getText().toString();
-        String department = ((EditText) findViewById(R.id.et_department)).getText().toString();
-        String occupation = ((EditText) findViewById(R.id.et_occupation)).getText().toString();
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(department) && !TextUtils.isEmpty(occupation)) {
-            FaceGetActivity.startFaceGetActivity(MainActivity.this, name, department, occupation);
+        final String name = ((EditText) findViewById(R.id.et_name)).getText().toString();
+        final String department = ((EditText) findViewById(R.id.et_department)).getText().toString();
+        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(department)) {
+            final MaterialDialog dialog = new MaterialDialog.Builder(MainActivity.this).cancelable(false)
+                    .content("请等待").show();
+            RetrofitClient.get().getId().observeOn(AndroidSchedulers.mainThread())
+                    .doFinally(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            dialog.dismiss();
+                        }
+                    })
+                    .subscribe(new Consumer<ResponseBean>() {
+                        @Override
+                        public void accept(ResponseBean responseBean) throws Exception {
+                            if (responseBean.isResult()) {
+                                FaceGetActivity.startFaceGetActivity(MainActivity.this
+                                        , responseBean.getMsg(), name, department);
+                            } else {
+                                throw new Exception(responseBean.getMsg());
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Toast.makeText(MainActivity.this, "请求失败："
+                                    + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
         }
     }
+
+
 }

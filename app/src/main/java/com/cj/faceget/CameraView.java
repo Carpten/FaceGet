@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
@@ -155,14 +156,19 @@ public class CameraView extends FrameLayout implements SurfaceHolder.Callback {
                 try {
                     YuvImage image = new YuvImage(data, ImageFormat.NV21, mPreviewSize.width, mPreviewSize.height, null);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    image.compressToJpeg(new Rect(0, 0, mPreviewSize.width, mPreviewSize.height), 80, stream);
+                    image.compressToJpeg(new Rect(0, 0, mPreviewSize.width, mPreviewSize.height), 100, stream);
                     stream.close();
                     Bitmap bitmap = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-                    mPhotoCallback.onPhoto(bitmap);
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                            bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    mPhotoCallback.onPhoto(resizedBitmap);
 
                     File file = new File(getContext().getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
                     FileOutputStream fos = new FileOutputStream(file);
-                    image.compressToJpeg(new Rect(0, 0, mPreviewSize.width, mPreviewSize.height), 80, fos);
+                    resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.flush();
                     fos.close();
                 } catch (Exception ignored) {
                 }

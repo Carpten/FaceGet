@@ -35,4 +35,6 @@
         android:onClick="takePhoto"
         android:text="拍照"
         android:textColor="#ffffff" />
+
+
 </RelativeLayout>

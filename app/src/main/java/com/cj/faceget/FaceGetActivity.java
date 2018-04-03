@@ -1,21 +1,20 @@
 package com.cj.faceget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
-public class FaceGetActivity extends AppCompatActivity {
+public class FaceGetActivity extends AppCompatActivity implements View.OnClickListener {
 
     private CameraView mCameraView;
     private ImageView mImageView;
@@ -25,9 +24,22 @@ public class FaceGetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_get);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mCameraView = findViewById(R.id.camera_view);
         mImageView = findViewById(R.id.image_view);
         mTextView = findViewById(R.id.text_view);
+        mImageView.setOnClickListener(this);
+        clearFile();
+    }
+
+    private void clearFile() {
+        File file = getExternalCacheDir();
+        if (file != null) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                f.delete();
+            }
+        }
     }
 
     public void takePhoto(View view) {
@@ -48,12 +60,42 @@ public class FaceGetActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-    public static void startFaceGetActivity(Context context, String name, String department, String occupation) {
+    public static void startFaceGetActivity(Context context, String id, String name, String department) {
         Intent intent = new Intent(context, FaceGetActivity.class);
+        intent.putExtra("id", id);
         intent.putExtra("name", name);
         intent.putExtra("department", department);
-        intent.putExtra("occupation", occupation);
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (!TextUtils.isEmpty(mTextView.getText())) {
+            UploadActivity.startUploadActivity(FaceGetActivity.this, 100, getIntent().getStringExtra("id"),
+                    getIntent().getStringExtra("name"), getIntent().getStringExtra("department"));
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (getExternalCacheDir() != null && getExternalCacheDir().listFiles() != null
+                && getExternalCacheDir().listFiles().length != 0) {
+            mTextView.setText(String.valueOf(getExternalCacheDir().listFiles().length));
+        } else {
+            mTextView.setText("");
+        }
+
+        if (resultCode == Activity.RESULT_OK) {
+            finish();
+        }
     }
 }
