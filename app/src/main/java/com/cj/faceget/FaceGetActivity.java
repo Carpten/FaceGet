@@ -79,7 +79,7 @@ public class FaceGetActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (!TextUtils.isEmpty(mTextView.getText())) {
-            UploadActivity.startUploadActivity(FaceGetActivity.this, 100, getIntent().getStringExtra("id"),
+            UploadActivity.startUploadActivity(FaceGetActivity.this, "", getIntent().getStringExtra("id"),
                     getIntent().getStringExtra("name"), getIntent().getStringExtra("department"));
         }
     }

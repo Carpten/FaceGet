@@ -27,7 +27,7 @@ interface ApiServer {
 
     @Multipart
     @POST("/upload")
-    Flowable<ResponseBean> updateImage(@Part("id") RequestBody id,
+    Flowable<ResponseBean> updateVideo(@Part("id") RequestBody id,
                                        @Part MultipartBody.Part file);
 
     @FormUrlEncoded

@@ -82,11 +82,12 @@ public class UploadActivity extends AppCompatActivity {
         }
     }
 
-    public static void startUploadActivity(Activity activity, int code, String id, String name, String department) {
+    public static void startUploadActivity(Activity activity, String path, String id, String name, String department) {
         Intent intent = new Intent(activity, UploadActivity.class);
+        intent.putExtra("path", path);
         intent.putExtra("id", id);
         intent.putExtra("name", name);
         intent.putExtra("department", department);
-        activity.startActivityForResult(intent, code);
+        activity.startActivity(intent);
     }
 }

@@ -32,16 +32,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private volatile static RetrofitClient mRetrofitClient;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
 
-    /**
-     * 在分页列表中，可以使用这个线程池可以控制网络返回按照网络请求顺序返回
-     * 这样可以避免极端条件下，列表拼装错误的问题，如先加载下一页，再下拉刷新数据，
-     * 如果返回顺序不对，将导致数据错误
-     **/
-    private ExecutorService singleExecutorService = Executors.newSingleThreadExecutor();
-
-    private static final long TIME_OUT = 1000 * 10;
+    private static final long TIME_OUT = 1000 * 60 * 2;
 
     private ApiServer mApiServer;
 
@@ -104,6 +96,13 @@ public class RetrofitClient {
                 e.onComplete();
             }
         }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.io());
+    }
+
+    public Flowable<ResponseBean> updateVideo(String id, File file) {
+        RequestBody photoRequestBody = RequestBody.create(MediaType.parse("audio/mp4"), file);
+        MultipartBody.Part f = MultipartBody.Part.createFormData("file", file.getName(), photoRequestBody);
+        RequestBody idBody = RequestBody.create(MediaType.parse("multipart/form-data"), id);//用户的id
+        return mApiServer.updateVideo(idBody, f).subscribeOn(Schedulers.io());
     }
 
     public Flowable<ResponseBean> newMsg(String id, String name, String department) {
