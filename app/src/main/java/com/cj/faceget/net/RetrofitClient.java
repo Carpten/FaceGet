@@ -33,7 +33,7 @@ public class RetrofitClient {
 
     private volatile static RetrofitClient mRetrofitClient;
 
-    private static final long TIME_OUT = 1000 * 60 * 2;
+    private static final long TIME_OUT = 1000 * 60;
 
     private ApiServer mApiServer;
 
