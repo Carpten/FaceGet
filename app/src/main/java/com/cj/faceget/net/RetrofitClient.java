@@ -38,6 +38,8 @@ public class RetrofitClient {
         //用Chrome 调试
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .writeTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
+//                .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
                 .build();
 
         mApiServer = new retrofit2.Retrofit.Builder()
