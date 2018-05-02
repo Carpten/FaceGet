@@ -4,10 +4,7 @@ import com.cj.faceget.model.ResponseBean;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.BackpressureStrategy;
@@ -33,14 +30,14 @@ public class RetrofitClient {
 
     private volatile static RetrofitClient mRetrofitClient;
 
-    private static final long TIME_OUT = 1000 * 60;
+    private static final long TIME_OUT = 1000 * 60 * 30;
 
     private ApiServer mApiServer;
 
     private RetrofitClient() {
         //用Chrome 调试
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
-                .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
+                .writeTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
                 .build();
 
         mApiServer = new retrofit2.Retrofit.Builder()
